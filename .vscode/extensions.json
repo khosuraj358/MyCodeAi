@@ -1,0 +1,36 @@
+{
+  "recommendations": [
+    // Python
+    "ms-python.python",
+    "ms-python.black-formatter",
+    "ms-python.pylint",
+
+    // TypeScript / Node
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+
+    // Git
+    "mhutchie.git-graph",
+    "eamodio.gitlens",
+
+    // Markdown
+    "yzhang.markdown-all-in-one",
+    "bierner.markdown-preview-github-styles",
+
+    // General dev
+    "streetsidesoftware.code-spell-checker",
+    "christian-kohler.path-intellisense",
+    "visualstudioexptteam.vscodeintellicode",
+    "formulahendry.auto-rename-tag",
+
+    // REST / API testing
+    "humao.rest-client",
+
+    // SQLite viewer
+    "qwtel.sqlite-viewer",
+
+    // TOML / dotenv
+    "tamasfe.even-better-toml",
+    "mikestead.dotenv"
+  ]
+}

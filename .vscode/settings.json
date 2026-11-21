@@ -1,0 +1,58 @@
+{
+  // ── Editor ────────────────────────────────────────────────────────────────
+  "editor.fontSize": 14,
+  "editor.tabSize": 4,
+  "editor.insertSpaces": true,
+  "editor.formatOnSave": true,
+  "editor.minimap.enabled": true,
+  "editor.wordWrap": "on",
+  "editor.suggestSelection": "first",
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": true,
+
+  // ── Files ─────────────────────────────────────────────────────────────────
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/*.pyc": true,
+    "**/.pytest_cache": true,
+    "**/node_modules": true,
+    "**/out": true,
+    "**/.kiro/memory.db": false
+  },
+
+  // ── Python ────────────────────────────────────────────────────────────────
+  "python.defaultInterpreterPath": "/usr/bin/python3",
+  "python.analysis.typeCheckingMode": "basic",
+  "python.formatting.provider": "black",
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.tabSize": 4
+  },
+
+  // ── TypeScript ────────────────────────────────────────────────────────────
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.tabSize": 2
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.tabSize": 2
+  },
+
+  // ── Terminal ──────────────────────────────────────────────────────────────
+  "terminal.integrated.defaultProfile.linux": "bash",
+  "terminal.integrated.fontSize": 13,
+
+  // ── Git ───────────────────────────────────────────────────────────────────
+  "git.autofetch": true,
+  "git.confirmSync": false,
+  "git.enableSmartCommit": true,
+
+  // ── MyCodeAI agent ────────────────────────────────────────────────────────
+  "mycodeai.agentUrl": "http://127.0.0.1:8765",
+  "mycodeai.model": "qwen2.5-coder:7b",
+  "mycodeai.autopilot": false,
+  "mycodeai.autoCheckpoint": true
+}

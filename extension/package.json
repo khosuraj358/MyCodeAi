@@ -1,0 +1,124 @@
+{
+  "name": "mycodeai",
+  "displayName": "MyCodeAI",
+  "description": "Local AI coding agent with Spec-driven development — no cloud, no API keys.",
+  "version": "0.1.0",
+  "publisher": "mycodeai",
+  "engines": { "vscode": "^1.85.0" },
+  "categories": ["AI", "Programming Languages", "Other"],
+  "activationEvents": ["onStartupFinished"],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "mycodeai.openAgent",
+        "title": "MyCodeAI: Open Agent Panel"
+      },
+      {
+        "command": "mycodeai.newSpec",
+        "title": "MyCodeAI: New Spec (Spec-driven development)"
+      },
+      {
+        "command": "mycodeai.approvePhase",
+        "title": "MyCodeAI: Approve Current Phase"
+      },
+      {
+        "command": "mycodeai.runNextTask",
+        "title": "MyCodeAI: Run Next Task"
+      },
+      {
+        "command": "mycodeai.checkpoint",
+        "title": "MyCodeAI: Create Git Checkpoint"
+      },
+      {
+        "command": "mycodeai.rewind",
+        "title": "MyCodeAI: Rewind to Checkpoint"
+      },
+      {
+        "command": "mycodeai.compact",
+        "title": "MyCodeAI: Compact Session Context"
+      },
+      {
+        "command": "mycodeai.openSpec",
+        "title": "MyCodeAI: Open Spec Panel"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "mycodeai",
+          "title": "MyCodeAI",
+          "icon": "resources/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "mycodeai": [
+        {
+          "type": "webview",
+          "id": "mycodeai.agentPanel",
+          "name": "Agent"
+        },
+        {
+          "id": "mycodeai.specTree",
+          "name": "Specs"
+        },
+        {
+          "id": "mycodeai.taskTree",
+          "name": "Tasks"
+        },
+        {
+          "id": "mycodeai.activityView",
+          "name": "Activity"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "MyCodeAI",
+      "properties": {
+        "mycodeai.agentUrl": {
+          "type": "string",
+          "default": "http://127.0.0.1:8765",
+          "description": "URL of the MyCodeAI agent server"
+        },
+        "mycodeai.model": {
+          "type": "string",
+          "default": "qwen2.5-coder:7b",
+          "description": "Default Ollama model"
+        },
+        "mycodeai.autopilot": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable autopilot mode (auto-allow file writes and shell commands)"
+        },
+        "mycodeai.autoCheckpoint": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically create Git checkpoints after each task"
+        }
+      }
+    },
+    "keybindings": [
+      {
+        "command": "mycodeai.openAgent",
+        "key": "ctrl+shift+a",
+        "mac": "cmd+shift+a"
+      }
+    ]
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "eslint src --ext ts",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.85.0",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.3.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0"
+  },
+  "dependencies": {}
+}

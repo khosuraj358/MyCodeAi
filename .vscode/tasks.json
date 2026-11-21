@@ -1,0 +1,66 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Install Python deps",
+      "type": "shell",
+      "command": "pip3 install -r agent/requirements.txt",
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "shared" }
+    },
+    {
+      "label": "Start Agent Server",
+      "type": "shell",
+      "command": "PYTHONPATH=${workspaceFolder} python3 -m agent.core.server",
+      "group": "build",
+      "isBackground": true,
+      "presentation": { "reveal": "always", "panel": "dedicated", "group": "server" },
+      "problemMatcher": {
+        "pattern": { "regexp": "^(.*)$", "message": 1 },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "MyCodeAI agent server",
+          "endsPattern": "Application startup complete"
+        }
+      }
+    },
+    {
+      "label": "Build Extension",
+      "type": "shell",
+      "command": "npm run compile",
+      "options": { "cwd": "${workspaceFolder}/extension" },
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "shared" }
+    },
+    {
+      "label": "Watch Extension",
+      "type": "shell",
+      "command": "npm run watch",
+      "options": { "cwd": "${workspaceFolder}/extension" },
+      "group": "build",
+      "isBackground": true,
+      "presentation": { "reveal": "always", "panel": "dedicated" }
+    },
+    {
+      "label": "Run Python Tests",
+      "type": "shell",
+      "command": "python3 -m pytest tests/ -v",
+      "group": "test",
+      "presentation": { "reveal": "always", "panel": "shared" }
+    },
+    {
+      "label": "Install Ollama",
+      "type": "shell",
+      "command": "curl -fsSL https://ollama.com/install.sh | sh",
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "shared" }
+    },
+    {
+      "label": "Pull Default Model",
+      "type": "shell",
+      "command": "ollama pull qwen2.5-coder:7b",
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "shared" }
+    }
+  ]
+}

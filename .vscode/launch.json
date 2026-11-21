@@ -1,0 +1,46 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "MyCodeAI: Start Agent Server",
+      "type": "python",
+      "request": "launch",
+      "module": "agent.core.server",
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}"
+      },
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "MyCodeAI: Debug Agent Server",
+      "type": "python",
+      "request": "launch",
+      "module": "agent.core.server",
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}",
+        "LOG_LEVEL": "debug"
+      },
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Extension: Run in Extension Host",
+      "type": "extensionHost",
+      "request": "launch",
+      "args": ["--extensionDevelopmentPath=${workspaceFolder}/extension"],
+      "outFiles": ["${workspaceFolder}/extension/out/**/*.js"]
+    }
+  ],
+  "compounds": [
+    {
+      "name": "MyCodeAI: Full Stack (Server + Extension)",
+      "configurations": [
+        "MyCodeAI: Start Agent Server",
+        "Extension: Run in Extension Host"
+      ]
+    }
+  ]
+}
