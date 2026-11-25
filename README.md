@@ -1,6 +1,6 @@
 # MyCodeAI IDE
 
-A fully local, open-source AI coding IDE inspired by Kiro IDE's workflow. No API keys, no cloud, no monthly quota.
+A fully local, open-source AI coding IDE inspired by Other IDE's workflow. No API keys, no cloud, no monthly quota.
 
 ## Core Philosophy
 
@@ -14,7 +14,7 @@ The agent never jumps straight to writing code. It first creates requirements, t
 |---|---|
 | Spec-driven development | Requirements → Design → Tasks → Implementation |
 | Agentic coding | Read, write, edit, execute, test via tool harness |
-| Steering files | `.kiro/steering/*.md` — project rules and standards |
+| Steering files | `./steering/*.md` — project rules and standards |
 | Custom agents | Developer, Planner, Reviewer, Debugger roles |
 | Hooks | Auto-actions on save, task complete, test pass |
 | Checkpoint / rewind | Git-based snapshots with restore |
@@ -70,7 +70,6 @@ MyCodeAI-IDE/
 │       └── webviews/       # Spec editor, task board webviews
 ├── specs/                  # Spec templates and examples
 ├── steering/               # Default steering file templates
-├── .kiro/                  # Runtime config (hooks, steering)
 ├── docs/                   # Architecture and usage docs
 └── scripts/                # Install, setup, dev scripts
 ```
