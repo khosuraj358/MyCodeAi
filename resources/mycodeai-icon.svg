@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <!-- Crystal gem gradient (magenta → red) -->
+    <linearGradient id="gem1" x1="20%" y1="0%" x2="80%" y2="100%">
+      <stop offset="0%"   stop-color="#f0247a"/>
+      <stop offset="40%"  stop-color="#d4175a"/>
+      <stop offset="100%" stop-color="#8b1a3a"/>
+    </linearGradient>
+    <!-- Crystal highlight face -->
+    <linearGradient id="gem2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#f94d94"/>
+      <stop offset="100%" stop-color="#c01555"/>
+    </linearGradient>
+    <!-- Crystal dark face -->
+    <linearGradient id="gem3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#6a0f30"/>
+      <stop offset="100%" stop-color="#2d0a1a"/>
+    </linearGradient>
+    <!-- Gold star gradient -->
+    <linearGradient id="star" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#f5c518"/>
+      <stop offset="50%"  stop-color="#d4921a"/>
+      <stop offset="100%" stop-color="#b06a10"/>
+    </linearGradient>
+    <!-- Teal for brackets and accents -->
+    <linearGradient id="teal" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#1a7a8a"/>
+      <stop offset="100%" stop-color="#0d3d4d"/>
+    </linearGradient>
+    <!-- Soft drop shadow -->
+    <filter id="shadow" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="4" dy="8" stdDeviation="12" flood-color="rgba(0,0,0,0.35)"/>
+    </filter>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- White background (transparent for PNG) -->
+  <!-- No background — transparent PNG -->
+
+  <!-- ── < bracket (left, teal/dark navy) ── -->
+  <g filter="url(#shadow)">
+    <polyline
+      points="130,250  60,320  130,390"
+      fill="none" stroke="url(#teal)" stroke-width="28"
+      stroke-linecap="square" stroke-linejoin="miter"/>
+  </g>
+
+  <!-- ── > bracket (right, teal/dark navy) ── -->
+  <g filter="url(#shadow)">
+    <polyline
+      points="345,250  415,320  345,390"
+      fill="none" stroke="url(#teal)" stroke-width="28"
+      stroke-linecap="square" stroke-linejoin="miter"/>
+  </g>
+
+  <!-- ── Crystal gem body — multi-facet polygon ── -->
+  <g filter="url(#shadow)">
+    <!-- Main front face (bright magenta) -->
+    <polygon
+      points="210,160  290,145  310,320  256,490  200,320"
+      fill="url(#gem1)"/>
+    <!-- Left highlight face -->
+    <polygon
+      points="210,160  175,230  175,370  200,320  210,160"
+      fill="url(#gem2)" opacity="0.9"/>
+    <!-- Right dark face -->
+    <polygon
+      points="290,145  330,220  330,375  310,320  290,145"
+      fill="url(#gem3)" opacity="0.85"/>
+    <!-- Top facet (bright pink highlight) -->
+    <polygon
+      points="210,160  256,120  290,145  256,170"
+      fill="#f94d94" opacity="0.7"/>
+    <!-- Bottom tip shadow -->
+    <polygon
+      points="200,320  256,490  310,320  256,420"
+      fill="#6a0f30" opacity="0.6"/>
+    <!-- Center highlight streak -->
+    <polygon
+      points="230,180  260,155  270,300  245,350"
+      fill="white" opacity="0.12"/>
+  </g>
+
+  <!-- ── Teal slash accent (top right of gem, like the logo) ── -->
+  <g filter="url(#glow)">
+    <line x1="295" y1="130" x2="355" y2="90"
+          stroke="url(#teal)" stroke-width="12" stroke-linecap="round"/>
+    <line x1="310" y1="145" x2="360" y2="120"
+          stroke="url(#teal)" stroke-width="7" stroke-linecap="round" opacity="0.6"/>
+  </g>
+
+  <!-- ── 4-point gold star (top center) ── -->
+  <g filter="url(#glow)" transform="translate(248, 68)">
+    <!-- Long vertical spike -->
+    <polygon points="0,-42  5,-8  0,42  -5,-8"  fill="url(#star)"/>
+    <!-- Long horizontal spike -->
+    <polygon points="-42,0  -8,5  42,0   -8,-5" fill="url(#star)"/>
+    <!-- Short diagonal spike (teal accent) -->
+    <polygon points="-20,-20 -4,-4  4,4   4,-4"  fill="#1a7a8a" opacity="0.8"/>
+    <!-- Center bright -->
+    <circle cx="0" cy="0" r="6" fill="#f5e57a"/>
+  </g>
+</svg>

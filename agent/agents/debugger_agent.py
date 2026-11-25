@@ -1,10 +1,5 @@
 """
-Debugger Agent — diagnoses and fixes failures.
-
-Triggered when:
-- A developer task fails validation
-- A reviewer gives a FAIL verdict
-- The user reports a bug
+Debugger Agent — diagnoses errors and applies minimal targeted fixes.
 """
 from __future__ import annotations
 
@@ -12,27 +7,25 @@ from ..core.config import settings
 from ..core.models import Session
 from .base_agent import BaseAgent
 
-DEBUGGER_SYSTEM_PROMPT = """
-You are the Debugger agent for MyCodeAI IDE. You diagnose and fix errors
-in code. You have access to file read/write tools and the shell.
+SYSTEM = """You are an expert debugger.
 
-Debugging process:
+Process:
 1. Read the error message carefully
-2. Read the relevant source files
-3. Identify the root cause (do not guess — trace the execution)
-4. Apply the minimal fix that resolves the issue
-5. Re-run the failing command to confirm the fix
-6. Report: root cause, fix applied, verification result
-
-Do not rewrite entire files. Make targeted, minimal changes.
-End with: BUG FIXED: <one-line summary> or CANNOT FIX: <reason>
+2. Read the relevant source files with read_file
+3. Identify the ROOT CAUSE (trace the execution, do not guess)
+4. Apply the MINIMAL fix — do not rewrite entire files
+5. Re-run the failing command to confirm the fix works
+6. End with either:
+   BUG FIXED: <one-line description>
+   CANNOT FIX: <reason>
 """
 
 
 class DebuggerAgent(BaseAgent):
-    name = "debugger"
-    system_prompt = DEBUGGER_SYSTEM_PROMPT
-    model = settings.default_model
+    name      = "debugger"
+    system_prompt = SYSTEM
+    model     = settings.default_model
+    use_tools = True
 
     async def debug(
         self,
@@ -40,16 +33,6 @@ class DebuggerAgent(BaseAgent):
         error: str,
         context: str = "",
     ) -> str:
-        prompt = f"""
-An error occurred that needs debugging:
-
-```
-{error}
-```
-
-{context}
-
-Diagnose and fix the issue.
-"""
+        prompt = f"Error to fix:\n\n```\n{error}\n```\n\n{context}"
         response = await self.run(session, prompt)
         return response.content

@@ -2,6 +2,7 @@
 Git tools: checkpoint (commit), rewind (restore), diff, log.
 Also provides a standalone GitTool class for the server.
 """
+
 from __future__ import annotations
 
 import asyncio
@@ -17,7 +18,8 @@ WORKSPACE = settings.workspace_root
 
 async def _git(args: list[str], cwd: Path = WORKSPACE) -> tuple[int, str, str]:
     proc = await asyncio.create_subprocess_exec(
-        "git", *args,
+        "git",
+        *args,
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,
         cwd=str(cwd),
@@ -54,9 +56,11 @@ async def git_checkpoint(message: str) -> str:
     full_msg = f"{settings.checkpoint_prefix}: {message}"
     code, sha, err = await _git(["commit", "-m", full_msg])
     if code != 0:
-        if "nothing to commit" in err:
-            return "Nothing to commit"
-        raise RuntimeError(f"Git commit failed: {err}")
+        if "nothing to commit" in err or "nothing added" in err:
+            return "Nothing new to commit"
+        # Non-fatal — log but don't raise
+        logger.warning("Git commit warning: %s", err)
+        return f"Checkpoint skipped: {err[:100]}"
 
     code, sha, _ = await _git(["rev-parse", "--short", "HEAD"])
     return f"Checkpoint created: {sha}"
@@ -68,9 +72,18 @@ async def git_checkpoint(message: str) -> str:
     parameters={
         "type": "object",
         "properties": {
-            "from_ref": {"type": "string", "description": "Base commit/branch (optional)"},
-            "to_ref": {"type": "string", "description": "Target commit/branch (optional)"},
-            "path": {"type": "string", "description": "Limit diff to this file path (optional)"},
+            "from_ref": {
+                "type": "string",
+                "description": "Base commit/branch (optional)",
+            },
+            "to_ref": {
+                "type": "string",
+                "description": "Target commit/branch (optional)",
+            },
+            "path": {
+                "type": "string",
+                "description": "Limit diff to this file path (optional)",
+            },
         },
         "required": [],
     },
@@ -93,7 +106,10 @@ async def git_diff(from_ref: str = None, to_ref: str = None, path: str = None) -
     parameters={
         "type": "object",
         "properties": {
-            "n": {"type": "integer", "description": "Number of commits to show (default 10)"},
+            "n": {
+                "type": "integer",
+                "description": "Number of commits to show (default 10)",
+            },
         },
         "required": [],
     },
@@ -117,7 +133,10 @@ async def git_log(n: int = 10) -> list[dict]:
         "type": "object",
         "properties": {
             "sha": {"type": "string", "description": "Commit SHA to restore to"},
-            "hard": {"type": "boolean", "description": "Hard reset (discards all uncommitted changes)"},
+            "hard": {
+                "type": "boolean",
+                "description": "Hard reset (discards all uncommitted changes)",
+            },
         },
         "required": ["sha"],
     },
@@ -134,6 +153,7 @@ async def git_rewind(sha: str, hard: bool = False) -> str:
 
 
 # ── Standalone class (used by the server endpoint) ────────────────────────────
+
 
 class GitTool:
     def __init__(self, workspace: Path = WORKSPACE):

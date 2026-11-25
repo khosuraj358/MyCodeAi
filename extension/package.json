@@ -1,12 +1,20 @@
 {
   "name": "mycodeai",
   "displayName": "MyCodeAI",
-  "description": "Local AI coding agent with Spec-driven development — no cloud, no API keys.",
-  "version": "0.1.0",
+  "description": "Autonomous AI coding agent \u2014 create files, run commands, build projects. No cloud, no API keys.",
+  "version": "0.3.8",
   "publisher": "mycodeai",
-  "engines": { "vscode": "^1.85.0" },
-  "categories": ["AI", "Programming Languages", "Other"],
-  "activationEvents": ["onStartupFinished"],
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "AI",
+    "Programming Languages",
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
@@ -110,7 +118,8 @@
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "lint": "eslint src --ext ts",
-    "package": "vsce package"
+    "package": "vsce package",
+    "vscode:prepublish": "tsc -p ./"
   },
   "devDependencies": {
     "@types/vscode": "^1.85.0",

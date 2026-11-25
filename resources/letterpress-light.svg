@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <!-- MyCodeAI crystal gem — light watermark version -->
+  <g opacity="0.14">
+    <!-- < bracket -->
+    <polyline points="48,88 18,128 48,168"
+      fill="none" stroke="#c01555" stroke-width="14"
+      stroke-linecap="square" stroke-linejoin="miter"/>
+    <!-- > bracket -->
+    <polyline points="168,88 198,128 168,168"
+      fill="none" stroke="#c01555" stroke-width="14"
+      stroke-linecap="square" stroke-linejoin="miter"/>
+    <!-- Crystal gem body -->
+    <polygon points="92,52 138,48 146,160 108,220 86,160" fill="#c01555"/>
+    <polygon points="92,52 72,88 72,168 86,160 92,52"    fill="#f0247a" opacity="0.7"/>
+    <polygon points="138,48 158,84 158,165 146,160 138,48" fill="#6a0f30" opacity="0.6"/>
+    <polygon points="92,52 108,42 138,48 108,58"          fill="#f0247a" opacity="0.4"/>
+    <!-- Star -->
+    <g transform="translate(122,30)">
+      <polygon points="0,-16 3,-5 14,-5 5,2 8,13 0,8 -8,13 -5,2 -14,-5 -3,-5"
+        fill="#b06a10" opacity="0.8"/>
+    </g>
+    <!-- Slash accent -->
+    <line x1="140" y1="40" x2="168" y2="20"
+          stroke="#0d5566" stroke-width="8" stroke-linecap="round"/>
+  </g>
+</svg>

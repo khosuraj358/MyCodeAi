@@ -1,6 +1,11 @@
 """
 Base class for all MyCodeAI agents.
-Provides the tool-use loop: think → call tool → observe → repeat.
+
+Tool-use loop per turn:
+  think → [call tool → observe] × N → final answer
+
+Tool schemas are only injected when the agent class sets `use_tools = True`,
+keeping plain-chat turns lean.
 """
 from __future__ import annotations
 
@@ -9,22 +14,27 @@ from typing import AsyncIterator, Optional
 
 from ..core.config import settings
 from ..core.context_engine import ContextEngine
-from ..core.models import Message, Role, Session, ToolResult
+from ..core.models import Message, Role, Session
 from ..core.ollama_client import ollama
 from ..tools.registry import tool_registry
 
 logger = logging.getLogger(__name__)
 
-MAX_TOOL_ROUNDS = 20  # safety limit per turn
+MAX_TOOL_ROUNDS = 12   # hard cap per single user turn
 
 
 class BaseAgent:
     name: str = "base"
-    system_prompt: str = "You are a helpful AI assistant."
+    system_prompt: str = "You are a helpful AI coding assistant."
     model: str = settings.default_model
+
+    # Set to True in subclasses that need file/shell tools
+    use_tools: bool = False
 
     def __init__(self):
         self.context_engine = ContextEngine()
+
+    # ── Non-streaming run ─────────────────────────────────────────────────────
 
     async def run(
         self,
@@ -33,54 +43,46 @@ class BaseAgent:
         extra_context: str = "",
         model: Optional[str] = None,
     ) -> Message:
-        """
-        Single-turn execution:
-        1. Build context window
-        2. Send to LLM
-        3. Execute any tool calls
-        4. Loop until no more tool calls or max rounds reached
-        5. Return final assistant message
-        """
-        from ..core.models import Message as Msg
-
         effective_model = model or self.model
+        tools = tool_registry.all_schemas() if self.use_tools else None
 
-        # Add the user message to session
-        user_msg = Msg(role=Role.USER, content=user_message)
+        # Append user turn
+        user_msg = Message(role=Role.USER, content=user_message)
         session.messages.append(user_msg)
 
         for _round in range(MAX_TOOL_ROUNDS):
-            system, window = self.context_engine.build_window(
+            system_prompt, window = self.context_engine.build_window(
                 session, self.system_prompt, extra_context
             )
             response = await ollama.chat(
                 messages=window,
                 model=effective_model,
-                tools=tool_registry.all_schemas(),
-                system_prompt=system,
+                tools=tools,
+                system_prompt=system_prompt,
             )
-
             session.messages.append(response)
 
+            # No tool calls → done
             if not response.tool_calls:
-                # No more tool calls — we're done
                 return response
 
-            # Execute tool calls
+            # Execute each tool call and feed results back
             for call in response.tool_calls:
-                logger.info("Tool call: %s(%s)", call.name, call.arguments)
-                result = await self._execute_tool(call)
+                logger.info("[%s] tool call: %s(%s)", self.name, call.name, call.arguments)
+                result = await tool_registry.dispatch(call)
                 response.tool_results.append(result)
 
-                # Add tool result back as a message so the LLM sees it
-                tool_msg = Msg(
-                    role=Role.TOOL,
-                    content=f"Tool {call.name} result:\n{result.output or result.error}",
+                result_text = (
+                    f"[{call.name} result]\n{result.output}"
+                    if not result.error
+                    else f"[{call.name} error]\n{result.error}"
                 )
-                session.messages.append(tool_msg)
+                session.messages.append(Message(role=Role.TOOL, content=result_text))
 
-        logger.warning("Max tool rounds (%d) reached for agent %s", MAX_TOOL_ROUNDS, self.name)
+        logger.warning("[%s] hit MAX_TOOL_ROUNDS=%d", self.name, MAX_TOOL_ROUNDS)
         return session.messages[-1]
+
+    # ── Streaming run ─────────────────────────────────────────────────────────
 
     async def stream_run(
         self,
@@ -89,40 +91,40 @@ class BaseAgent:
         extra_context: str = "",
         model: Optional[str] = None,
     ) -> AsyncIterator[dict]:
-        """
-        Streaming version — yields dicts with type "token" | "tool_call" | "tool_result" | "done".
-        """
-        from ..core.models import Message as Msg
-
         effective_model = model or self.model
-        user_msg = Msg(role=Role.USER, content=user_message)
+
+        user_msg = Message(role=Role.USER, content=user_message)
         session.messages.append(user_msg)
 
-        buffer = ""
-        system, window = self.context_engine.build_window(session, self.system_prompt)
+        # Stream first response
+        system_prompt, window = self.context_engine.build_window(
+            session, self.system_prompt, extra_context
+        )
 
+        buffer = ""
         async for token in ollama.stream_chat(
             messages=window,
             model=effective_model,
-            system_prompt=system,
+            system_prompt=system_prompt,
         ):
             buffer += token
             yield {"type": "token", "content": token}
 
-        # Parse tool calls from full buffer and execute
-        response = Msg(role=Role.ASSISTANT, content=buffer)
-        from ..core.ollama_client import TOOL_CALL_MARKER, OllamaClient
-        client = OllamaClient()
-        response.tool_calls = client._extract_tool_calls(buffer)
-        response.content = client._strip_tool_calls(buffer) if response.tool_calls else buffer
+        # Parse and execute any tool calls from the full buffer
+        response = Message(role=Role.ASSISTANT, content=buffer)
+        response.tool_calls = ollama._extract_tool_calls(buffer)
+        response.content    = ollama._strip_tool_calls(buffer) if response.tool_calls else buffer.strip()
         session.messages.append(response)
 
         for call in response.tool_calls:
             yield {"type": "tool_call", "name": call.name, "arguments": call.arguments}
-            result = await self._execute_tool(call)
-            yield {"type": "tool_result", "name": call.name, "output": str(result.output), "error": result.error}
+            result = await tool_registry.dispatch(call)
+            yield {"type": "tool_result", "name": call.name,
+                   "output": str(result.output or ""), "error": result.error}
+
+            session.messages.append(Message(
+                role=Role.TOOL,
+                content=f"[{call.name}]\n{result.output or result.error}",
+            ))
 
         yield {"type": "done", "session_id": session.id}
-
-    async def _execute_tool(self, call):
-        return await tool_registry.dispatch(call)

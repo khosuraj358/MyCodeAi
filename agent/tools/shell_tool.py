@@ -4,21 +4,19 @@ Shell execution tool: run terminal commands inside the workspace.
 from __future__ import annotations
 
 import asyncio
-import shlex
-from pathlib import Path
 
-from ..core.config import settings
+from ._paths import resolve_path
 from .registry import tool_registry
 
-WORKSPACE = settings.workspace_root
 TIMEOUT = 120  # seconds
 
 
 @tool_registry.register(
     name="run_command",
     description=(
-        "Execute a shell command in the workspace directory. "
-        "Use this to run build tools, tests, linters, package managers, etc. "
+        "Execute a shell command. Can run anywhere inside /home, /tmp or the "
+        "workspace — set cwd to the project directory (e.g. "
+        "/home/ubuntu/Desktop/myapp) to install deps, build, test or run code. "
         "Avoid interactive commands."
     ),
     parameters={
@@ -27,7 +25,7 @@ TIMEOUT = 120  # seconds
             "command": {"type": "string", "description": "Shell command to run"},
             "cwd": {
                 "type": "string",
-                "description": "Working directory relative to workspace root (default: workspace root)",
+                "description": "Working directory (absolute, or relative to workspace root). Default: workspace root",
             },
             "timeout": {
                 "type": "integer",
@@ -39,9 +37,9 @@ TIMEOUT = 120  # seconds
     requires_permission=True,
 )
 async def run_command(command: str, cwd: str = ".", timeout: int = TIMEOUT) -> dict:
-    work_dir = (WORKSPACE / cwd).resolve()
-    if not str(work_dir).startswith(str(WORKSPACE.resolve())):
-        raise PermissionError("Working directory outside workspace")
+    work_dir = resolve_path(cwd or ".")
+    if not work_dir.is_dir():
+        raise NotADirectoryError(f"Working directory does not exist: {work_dir}")
 
     proc = await asyncio.create_subprocess_shell(
         command,

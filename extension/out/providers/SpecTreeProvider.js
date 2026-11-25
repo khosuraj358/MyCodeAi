@@ -1,0 +1,91 @@
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SpecTreeProvider = void 0;
+const vscode = __importStar(require("vscode"));
+class SpecTreeProvider {
+    constructor(client) {
+        this.client = client;
+        this._onDidChangeTreeData = new vscode.EventEmitter();
+        this.onDidChangeTreeData = this._onDidChangeTreeData.event;
+    }
+    refresh() {
+        this._onDidChangeTreeData.fire();
+    }
+    getTreeItem(element) {
+        return element;
+    }
+    async getChildren(element) {
+        if (element)
+            return [];
+        try {
+            const specs = await this.client.listSpecs();
+            return specs.map(s => new SpecTreeItem(s));
+        }
+        catch {
+            return [new SpecTreeItem({ id: '', name: '(agent offline)', goal: '', phase: '', created_at: '' })];
+        }
+    }
+}
+exports.SpecTreeProvider = SpecTreeProvider;
+class SpecTreeItem extends vscode.TreeItem {
+    constructor(spec) {
+        super(spec.name || '(unnamed)', vscode.TreeItemCollapsibleState.None);
+        this.spec = spec;
+        this.description = spec.phase;
+        this.tooltip = spec.goal;
+        this.iconPath = phaseIcon(spec.phase);
+        this.contextValue = 'spec';
+        if (spec.id) {
+            this.command = {
+                command: 'mycodeai.openSpec',
+                title: 'Open Spec',
+                arguments: [spec.id],
+            };
+        }
+    }
+}
+function phaseIcon(phase) {
+    switch (phase) {
+        case 'requirements': return new vscode.ThemeIcon('list-unordered');
+        case 'design': return new vscode.ThemeIcon('symbol-class');
+        case 'tasks': return new vscode.ThemeIcon('checklist');
+        case 'implementation': return new vscode.ThemeIcon('tools');
+        case 'review': return new vscode.ThemeIcon('eye');
+        case 'done': return new vscode.ThemeIcon('pass-filled');
+        default: return new vscode.ThemeIcon('circle-outline');
+    }
+}
+//# sourceMappingURL=SpecTreeProvider.js.map
